@@ -79,7 +79,8 @@ code {
 }
 
 .filters {
-  margin-top: 1rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.1rem;
   background-color: #ffffff;
   /* height: auto; */
   padding: 0.5rem;
@@ -132,10 +133,18 @@ code {
 
 
 .table {
-  margin-top: 1rem;
+  /* margin-top: 1rem; */
   width: 100%;
   border-collapse: collapse;
 }
+
+.table thead {
+  position: sticky;
+  top: -8px;
+  background-color: white;
+  z-index: 10;
+}
+
 
 .table th,
 .table td {
@@ -208,6 +217,39 @@ code {
 .action {
   position: relative;
   left: 1rem;
+}
+
+.table-pagination{
+  height:2.5rem;
+  width:100%;
+  background-color:white;
+  padding: 0.5rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap:1rem
+}
+
+.rows-per-page-option{
+  border:none;
+  font-size: 12px;
+  font-weight: 400;
+  color: #545454;
+  cursor: pointer;
+}
+
+.pagination-controls{
+  margin-left:0.5rem;
+  display: flex;
+  gap:0.5rem;
+  cursor: pointer;
+}
+
+.row-range-text{
+  font-size: 12px;
+  font-weight: 400;
+  color: #545454;
 }
 
 @media (max-width:600px) {

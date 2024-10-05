@@ -5,36 +5,45 @@ import locationIcon from "../src/assets/LocationIcon.svg";
 import statusIcon from "../src/assets/StatusIcon.svg";
 import warningIcon from "../src/assets/WarningIcon.svg";
 import actionIcon from "../src/assets/ActionIcon.svg";
+import arrowLeftIcon from "../src/assets/ArrowLeftIcon.svg";
+import previousIcon from "../src/assets/PreviousIcon.svg";
+import nextIcon from "../src/assets/NextIcon.svg";
+import arrowRightIcon from "../src/assets/ArrowRightIcon.svg"
 
 import axios from "axios";
 
 
 
 function App() {
-  // let rowData =
-  // {
-  //   "name": "Camera 1",
-  //   "location": "Denver, CO",
-  //   "recorder": "Denver Recorder",
-  //   "tasks": "4",
-  //   "status": "Active",
-  //   "_id": "66d1b0684bd38a998b414a93",
-  //   "id": 1,
-  //   "current_status": "Online",
-  //   "health": {
-  //     "cloud": "A",
-  //     "device": "A",
-  //     "_id": "6700117fe7f0220e065420fa",
-  //     "id": "6700117fe7f0220e065420fa"
-  //   },
-  //   "hasWarning": true
-  // }
-
-
   const [camerasList, setCamerasList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const token = "4ApVMIn5sTxeW7GQ5VWeWiy";
+
+
+  const totalPages = Math.ceil(camerasList.length / rowsPerPage);
+
+  const startRow = (currentPage - 1) * rowsPerPage + 1;
+  const endRow = Math.min(currentPage * rowsPerPage, camerasList.length);
+
+  const paginatedData = camerasList.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
+
+  const handleRowsPerPageChange = (e) => {
+    setRowsPerPage(Number(e.target.value));
+    setCurrentPage(1); // Reset to first page when rows per page changes
+  };
+
+  // Handle pagination controls
+  const handleFirstPage = () => setCurrentPage(1);
+  const handlePreviousPage = () => currentPage > 1 && setCurrentPage(currentPage - 1);
+  const handleNextPage = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
+  const handleLastPage = () => setCurrentPage(totalPages);
+
 
   const fetchCameras = async () => {
     try {
@@ -118,8 +127,8 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {camerasList.length ? camerasList.map((rowData) => (
-              <tr>
+            {paginatedData.length ? paginatedData.map((rowData) => (
+              <tr key={rowData._id}>
                 <td><input type="checkbox" /></td>
                 <td>
                   <div className="name">
@@ -139,13 +148,13 @@ function App() {
                   <span className="location">{rowData.location}</span>
                 </td>
                 <td>
-                  <span className="recorder">{rowData.recorder !== "" ?rowData.recorder : 'N/A' }</span>
+                  <span className="recorder">{rowData.recorder !== "" ? rowData.recorder : 'N/A'}</span>
                 </td>
                 <td>
                   <span className="tasks">{rowData.tasks} Tasks</span>
                 </td>
                 <td>
-                  <div className="status" style={{ backgroundColor: rowData.status === "Active" ? '0292621A' : "#F0F0F0" }}>
+                  <div className="status" style={{ backgroundColor: rowData.status === "Active" ? '#0292621A' : "#F0F0F0" }}>
                     <span className="status-text"
                       style={{
                         color: rowData.status === "Active" ? '#029262' : "#545454"
@@ -165,6 +174,31 @@ function App() {
         </table>
       </div>
 
+      {/** Table pagination */}
+      <div className="table-pagination">
+
+        <div className="rows-per-page">
+          <select value={rowsPerPage} onChange={handleRowsPerPageChange} className="rows-per-page-option">
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+          </select>
+        </div>
+
+        <div className="row-range">
+          <span className="row-range-text">
+            {startRow}-{endRow} of {camerasList.length}
+          </span>
+        </div>
+
+        <div className="pagination-controls">
+          <img src={arrowLeftIcon} onClick={handleFirstPage} />
+          <img src={previousIcon} onClick={handlePreviousPage} />
+          <img src={nextIcon} onClick={handleNextPage} />
+          <img src={arrowRightIcon} onClick={handleLastPage} />
+        </div>
+
+      </div>
     </div>
   );
 }
