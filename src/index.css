@@ -201,6 +201,24 @@ code {
   margin-left: 1.2rem;
 }
 
+.health{
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.health-cloud,.health-device{
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.health-text{
+  font-size: 10px;
+  font-weight: 500;
+  color:#343434
+}
+
 .location,
 .recorder,
 .tasks {

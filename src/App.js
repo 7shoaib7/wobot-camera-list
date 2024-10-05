@@ -9,7 +9,9 @@ import arrowLeftIcon from "../src/assets/ArrowLeftIcon.svg";
 import previousIcon from "../src/assets/PreviousIcon.svg";
 import nextIcon from "../src/assets/NextIcon.svg";
 import arrowRightIcon from "../src/assets/ArrowRightIcon.svg";
-import actionInactiveIcon from "../src/assets/ActionInactiveIcon.svg"
+import actionInactiveIcon from "../src/assets/ActionInactiveIcon.svg";
+import cloudIcon from "../src/assets/Cloud.svg";
+import deviceIcon from "../src/assets/Edge.svg"
 
 import axios from "axios";
 
@@ -112,7 +114,7 @@ function App() {
           Authorization: `Bearer ${token}`,
         },
       });
-      // Optionally, you can update the local state to reflect the change
+
       setCamerasList(prevCameras =>
         prevCameras.map(camera =>
           camera.id === id ? { ...camera, status } : camera
@@ -215,7 +217,18 @@ function App() {
                   </div>
 
                 </td>
-                <td>Healthy</td>
+                <td>
+                  <div className="health">
+                    <div className="health-cloud">
+                      <img src={cloudIcon} alt="cloud-icon" />
+                      <span className="health-text">{camera.health.cloud}</span>
+                    </div>
+                    <div className="health-device">
+                      <img src={deviceIcon} alt="device-icon" />
+                      <span className="health-text">{camera.health.device}</span>
+                    </div>
+                  </div>
+                </td>
                 <td>
                   <span className="location">{camera.location}</span>
                 </td>
