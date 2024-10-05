@@ -15,7 +15,8 @@ code {
 
 .App {
   background-color: #F0F0F0;
-  padding: 1rem
+  padding: 2rem;
+  /* height: 100vh; */
 }
 
 
@@ -49,7 +50,6 @@ code {
 }
 
 .search-box {
-  width: 240px;
   height: 40px;
   background-color: lightgrey;
   border-radius: 6px;
@@ -76,4 +76,152 @@ code {
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
+}
+
+.filters {
+  margin-top: 1rem;
+  background-color: #ffffff;
+  /* height: auto; */
+  padding: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.filter-location-container,
+.filter-status-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 2.5rem;
+}
+
+.filter-location,
+.filter-status {
+  width: 12rem;
+  height: 100%;
+  border-radius: 4px;
+  border: 1px solid #CED4DA;
+  outline: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #545454;
+  padding-left: 25px;
+}
+
+.location-icon,
+.status-icon {
+  position: absolute;
+  left: 10px;
+}
+
+
+.table-container {
+  height: 30rem;
+  width: 100%;
+  background-color: #ffffff;
+  padding: 0.5rem;
+  overflow: auto;
+  scrollbar-width: none;
+}
+
+.table-container::-webkit-scrollbar {
+  display: none;
+}
+
+
+.table {
+  margin-top: 1rem;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 12px;
+  text-align: left;
+  /* border: 1px solid #ddd; */
+}
+
+.table th {
+  font-size: 14px;
+  font-weight: 500;
+  color: #7E7E7E;
+}
+
+.name {
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  gap: 0.5rem;
+}
+
+.name-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.name-status {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+
+}
+
+.name-text {
+  font-size: 14px;
+  font-weight: 400;
+  color: #545454;
+}
+
+.name-bottom {
+  font-size: 12px;
+  font-weight: 400;
+  color: #7e7e7e;
+  margin-left: 1.2rem;
+}
+
+.location,
+.recorder,
+.tasks {
+  font-size: 14px;
+  font-weight: 400;
+  color: #545454;
+}
+
+.status {
+  width: 53px;
+  height: 23px;
+  border-radius: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.status-text {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.action {
+  position: relative;
+  left: 1rem;
+}
+
+@media (max-width:600px) {
+  .filters {
+    gap: 1rem
+  }
+
+  .filter-location-container,
+  .filter-status-container {
+    width: 100%;
+  }
+
+  .filter-location,
+  .filter-status {
+    width: 100%;
+  }
 }
