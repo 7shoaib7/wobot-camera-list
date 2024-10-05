@@ -4,11 +4,12 @@ import searchIcon from "../src/assets/SearchIcon.svg";
 import locationIcon from "../src/assets/LocationIcon.svg";
 import statusIcon from "../src/assets/StatusIcon.svg";
 import warningIcon from "../src/assets/WarningIcon.svg";
-import actionIcon from "../src/assets/ActionIcon.svg";
+import actionActiveIcon from "../src/assets/ActionActiveIcon.svg";
 import arrowLeftIcon from "../src/assets/ArrowLeftIcon.svg";
 import previousIcon from "../src/assets/PreviousIcon.svg";
 import nextIcon from "../src/assets/NextIcon.svg";
-import arrowRightIcon from "../src/assets/ArrowRightIcon.svg"
+import arrowRightIcon from "../src/assets/ArrowRightIcon.svg";
+import actionInactiveIcon from "../src/assets/ActionInactiveIcon.svg"
 
 import axios from "axios";
 
@@ -47,11 +48,6 @@ function App() {
 
   const startRow = (currentPage - 1) * rowsPerPage + 1;
   const endRow = Math.min(currentPage * rowsPerPage, filteredCameras.length);
-
-  // const paginatedData = camerasList.slice(
-  //   (currentPage - 1) * rowsPerPage,
-  //   currentPage * rowsPerPage
-  // );
 
   // Paginate after filtering
   const paginatedData = filteredCameras.slice(
@@ -104,6 +100,36 @@ function App() {
     fetchCameras();
   }, []);
 
+
+  // Function to update camera status
+  const updateCameraStatus = async (id, status) => {
+    try {
+      await axios.put('https://api-app-staging.wobot.ai/app/v1/update/camera/status', {
+        id: id,
+        status: status,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      // Optionally, you can update the local state to reflect the change
+      setCamerasList(prevCameras =>
+        prevCameras.map(camera =>
+          camera.id === id ? { ...camera, status } : camera
+        )
+      );
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+
+
+  // Handle delete
+  const handleDelete = (id) => {
+    const updatedCamerasList = camerasList.filter((camera) => camera._id !== id);
+    setCamerasList(updatedCamerasList);
+  };
 
 
   return (
@@ -160,7 +186,7 @@ function App() {
           <thead>
             <tr>
               <th>
-                <input type="checkbox" />
+                <input type="checkbox" className="table-checkbox" />
               </th>
               <th>NAME</th>
               <th>HEALTH</th>
@@ -169,18 +195,19 @@ function App() {
               <th>TASKS</th>
               <th>STATUS</th>
               <th>ACTIONS</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
-            {paginatedData.length ? paginatedData.map((rowData) => (
-              <tr key={rowData._id}>
-                <td><input type="checkbox" /></td>
+            {paginatedData.length ? paginatedData.map((camera) => (
+              <tr key={camera._id}>
+                <td><input type="checkbox" className="table-checkbox" /></td>
                 <td>
                   <div className="name">
                     <div className="name-top">
-                      <div className="name-status" style={{ backgroundColor: rowData.current_status === "Online" ? "#029262" : "#DC3545" }}></div>
-                      <div className="name-text">{rowData.name}</div>
-                      {rowData.hasWarning && <img src={warningIcon} alt="warning-icon" className="name-warning" />}
+                      <div className="name-status" style={{ backgroundColor: camera.current_status === "Online" ? "#029262" : "#DC3545" }}></div>
+                      <div className="name-text">{camera.name}</div>
+                      {camera.hasWarning && <img src={warningIcon} alt="warning-icon" className="name-warning" />}
                     </div>
                   </div>
                   <div className="name-bottom">
@@ -190,27 +217,33 @@ function App() {
                 </td>
                 <td>Healthy</td>
                 <td>
-                  <span className="location">{rowData.location}</span>
+                  <span className="location">{camera.location}</span>
                 </td>
                 <td>
-                  <span className="recorder">{rowData.recorder !== "" ? rowData.recorder : 'N/A'}</span>
+                  <span className="recorder">{camera.recorder !== "" ? camera.recorder : 'N/A'}</span>
                 </td>
                 <td>
-                  <span className="tasks">{rowData.tasks} Tasks</span>
+                  <span className="tasks">{camera.tasks} Tasks</span>
                 </td>
                 <td>
-                  <div className="status" style={{ backgroundColor: rowData.status === "Active" ? '#0292621A' : "#F0F0F0" }}>
+                  <div className="status" style={{ backgroundColor: camera.status === "Active" ? '#0292621A' : "#F0F0F0" }}>
                     <span className="status-text"
                       style={{
-                        color: rowData.status === "Active" ? '#029262' : "#545454"
+                        color: camera.status === "Active" ? '#029262' : "#545454"
                       }}>
-                      {rowData.status === 'Active' ? "Active" : "Inactive"}
+                      {camera.status === 'Active' ? "Active" : "Inactive"}
                     </span>
                   </div>
                 </td>
                 <td>
-                  <div className="action">
-                    <img src={actionIcon} alt="action-icon" />
+                  <div className="action" onClick={() => updateCameraStatus(camera.id, camera.status === "Active" ? "Inactive" : "Active")}>
+                    {camera.status === "Active" ? <img src={actionActiveIcon} alt="action-icon" />
+                      : <img src={actionInactiveIcon} alt="action-icon" />}
+                  </div>
+                </td>
+                <td>
+                  <div className="delete-row" style={{ background: "#DC3545", cursor: "pointer" }} onClick={() => handleDelete(camera._id)}>
+                    <span className="delete-row-text" style={{ color: "white" }}>Delete</span>
                   </div>
                 </td>
               </tr>
@@ -220,13 +253,13 @@ function App() {
       </div>
 
       {/** Table pagination */}
-      <div className="table-pagination">
+      {paginatedData.length ? <div className="table-pagination">
 
         <div className="rows-per-page">
           <select value={rowsPerPage} onChange={handleRowsPerPageChange} className="rows-per-page-option">
             <option value={10}>10</option>
             <option value={20}>20</option>
-            <option value={50}>50</option>
+            <option value={50}>30</option>
           </select>
         </div>
 
@@ -243,7 +276,7 @@ function App() {
           <img src={arrowRightIcon} onClick={handleLastPage} alt="arrow-right-icon" />
         </div>
 
-      </div>
+      </div> : null}
     </div>
   );
 }

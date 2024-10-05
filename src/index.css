@@ -159,6 +159,15 @@ code {
   color: #7E7E7E;
 }
 
+.table-checkbox {
+  height: 16px;
+  width: 16px;
+  border: 1px solid #CED4DA;
+  border-radius: 2px;
+  cursor: pointer;
+  outline: none;
+}
+
 .name {
   display: flex;
   flex-direction: column;
@@ -200,7 +209,7 @@ code {
   color: #545454;
 }
 
-.status {
+.status,.delete-row {
   width: 53px;
   height: 23px;
   border-radius: 2px;
@@ -209,7 +218,7 @@ code {
   align-items: center;
 }
 
-.status-text {
+.status-text ,.delete-row-text{
   font-size: 12px;
   font-weight: 500;
 }
@@ -250,6 +259,13 @@ code {
   font-size: 12px;
   font-weight: 400;
   color: #545454;
+}
+
+.no-data-found{
+  display:flex;
+  justify-content: center;
+  align-items: center; 
+  height: 100%; 
 }
 
 @media (max-width:600px) {
