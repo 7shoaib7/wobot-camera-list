@@ -16,22 +16,49 @@ import axios from "axios";
 
 function App() {
   const [camerasList, setCamerasList] = useState([]);
+  const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  // Filter states
+  const [locationFilter, setLocationFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+
   const token = "4ApVMIn5sTxeW7GQ5VWeWiy";
 
 
-  const totalPages = Math.ceil(camerasList.length / rowsPerPage);
+  // **Filter Logic**
+  const filteredCameras = camerasList.filter((camera) => {
+    const matchesLocation = locationFilter ? camera.location === locationFilter : true;
+    const matchesStatus = statusFilter ? camera.status === statusFilter : true;
+    const matchesSearchQuery = searchQuery
+      ? camera.name.toLowerCase().includes(searchQuery.toLowerCase())
+      : true;
+    return matchesLocation && matchesStatus && matchesSearchQuery;
+  });
+
+
+  const totalPages = Math.ceil(filteredCameras.length / rowsPerPage);
 
   const startRow = (currentPage - 1) * rowsPerPage + 1;
-  const endRow = Math.min(currentPage * rowsPerPage, camerasList.length);
+  const endRow = Math.min(currentPage * rowsPerPage, filteredCameras.length);
 
-  const paginatedData = camerasList.slice(
+  // const paginatedData = camerasList.slice(
+  //   (currentPage - 1) * rowsPerPage,
+  //   currentPage * rowsPerPage
+  // );
+
+  // Paginate after filtering
+  const paginatedData = filteredCameras.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
+
 
   const handleRowsPerPageChange = (e) => {
     setRowsPerPage(Number(e.target.value));
@@ -44,6 +71,12 @@ function App() {
   const handleNextPage = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
   const handleLastPage = () => setCurrentPage(totalPages);
 
+
+  // Function to extract unique locations
+  const extractLocations = (cameraList) => {
+    const uniqueLocations = [...new Set(cameraList.map(camera => camera.location))];
+    setLocations(uniqueLocations);
+  };
 
   const fetchCameras = async () => {
     try {
@@ -58,6 +91,7 @@ function App() {
       const result = response.data.data
       console.log("cameras", result);
       setCamerasList(result);
+      extractLocations(result);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -69,6 +103,8 @@ function App() {
   useEffect(() => {
     fetchCameras();
   }, []);
+
+
 
   return (
     <div className="App">
@@ -84,7 +120,7 @@ function App() {
           <h6 className="header-title-bottom">Manage your cameras here.</h6>
         </div>
         <div className="search-box-container">
-          <input className="search-box" placeholder="search" />
+          <input className="search-box" placeholder="search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
           <img src={searchIcon} alt="searchIcon" className="search-icon" />
         </div>
       </div>
@@ -93,18 +129,27 @@ function App() {
       <div className="filters">
         <div className="filter-location-container">
           <img src={locationIcon} alt="location-icon" className="location-icon" />
-          <select className="filter-location">
+          <select className="filter-location"
+            value={locationFilter}
+            onChange={(e) => setLocationFilter(e.target.value)}
+          >
             <option value="" disabled selected hidden>Location</option>
-            <option value="new-york">New York</option>
-            <option value="london">London</option>
+            {locations.map((location, index) => (
+              <option key={index} value={location}>
+                {location}
+              </option>
+            ))}
           </select>
         </div>
         <div className="filter-status-container">
           <img src={statusIcon} alt="status-icon" className="status-icon" />
-          <select className="filter-status">
+          <select className="filter-status"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
             <option value="" disabled selected hidden>Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
           </select>
         </div>
       </div>
@@ -187,15 +232,15 @@ function App() {
 
         <div className="row-range">
           <span className="row-range-text">
-            {startRow}-{endRow} of {camerasList.length}
+            {startRow}-{endRow} of {filteredCameras.length}
           </span>
         </div>
 
         <div className="pagination-controls">
-          <img src={arrowLeftIcon} onClick={handleFirstPage} />
-          <img src={previousIcon} onClick={handlePreviousPage} />
-          <img src={nextIcon} onClick={handleNextPage} />
-          <img src={arrowRightIcon} onClick={handleLastPage} />
+          <img src={arrowLeftIcon} onClick={handleFirstPage} alt="arrow-left-icon" />
+          <img src={previousIcon} onClick={handlePreviousPage} alt="previous-icon" />
+          <img src={nextIcon} onClick={handleNextPage} alt="next-icon" />
+          <img src={arrowRightIcon} onClick={handleLastPage} alt="arrow-right-icon" />
         </div>
 
       </div>
