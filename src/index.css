@@ -285,18 +285,32 @@ code {
   height: 100%; 
 }
 
+.reset-button{
+  background-color: #F0F0F0;
+  color: #545454;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 10rem;
+  height: 2rem;
+  border-radius: 1rem;
+  cursor: pointer;
+}
+
+.reset-button:hover{
+  background-color: lightgrey;
+}
+
 @media (max-width:600px) {
   .filters {
     gap: 1rem
   }
 
-  .filter-location-container,
-  .filter-status-container {
+  .filter-container{
     width: 100%;
   }
 
-  .filter-location,
-  .filter-status {
+  .filter-select{
     width: 100%;
   }
 }

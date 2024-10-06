@@ -12,6 +12,7 @@ import Filter from "./components/Filter";
 import Table from "./components/Table";
 import Pagination from "./components/Pagination";
 import Spinner from "./components/Spinner";
+import NoDataFound from "./components/NoDataFound";
 
 
 
@@ -136,6 +137,13 @@ function App() {
   };
 
 
+  // Reset Filters
+  const resetFilters = () => {
+    setLocationFilter("");
+    setStatusFilter("");
+    setSearchQuery("");
+  };
+
   return (
     <div className="App">
       {/* Logo Container */}
@@ -175,7 +183,14 @@ function App() {
 
       {/** Table */}
       <div className="table-container">
-        {loading ? <Spinner /> : <Table
+        {loading ? <Spinner /> : filteredCameras.length === 0 ? (
+          <>
+            <NoDataFound message="No cameras found for the applied filters." />
+            <div className="reset-button" onClick={resetFilters}>
+              Reset
+            </div>
+          </>
+        ) : <Table
           data={paginatedData}
           onDelete={handleDelete}
           onStatusChange={updateCameraStatus}
