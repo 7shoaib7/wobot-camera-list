@@ -11,6 +11,7 @@ import statusIcon from "../src/assets/StatusIcon.svg";
 import Filter from "./components/Filter";
 import Table from "./components/Table";
 import Pagination from "./components/Pagination";
+import Spinner from "./components/Spinner";
 
 
 
@@ -78,6 +79,7 @@ function App() {
 
   const fetchCameras = async () => {
     try {
+      setLoading(true)
       const response = await axios.get(
         "https://api-app-staging.wobot.ai/app/v1/fetch/cameras",
         {
@@ -87,7 +89,7 @@ function App() {
         }
       );
       const result = response.data.data
-      console.log("cameras", result);
+      // console.log("cameras", result);
       setCamerasList(result);
       extractLocations(result);
     } catch (err) {
@@ -173,11 +175,11 @@ function App() {
 
       {/** Table */}
       <div className="table-container">
-        <Table
+        {loading ? <Spinner /> : <Table
           data={paginatedData}
           onDelete={handleDelete}
           onStatusChange={updateCameraStatus}
-        />
+        />}
       </div>
 
       {/** Table pagination */}
