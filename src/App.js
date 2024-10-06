@@ -1,19 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import axios from "axios";
+
+//assets
 import brandLogo from "../src/assets/BrandLogo.svg";
 import searchIcon from "../src/assets/SearchIcon.svg";
 import locationIcon from "../src/assets/LocationIcon.svg";
 import statusIcon from "../src/assets/StatusIcon.svg";
-import warningIcon from "../src/assets/WarningIcon.svg";
-import actionActiveIcon from "../src/assets/ActionActiveIcon.svg";
-import arrowLeftIcon from "../src/assets/ArrowLeftIcon.svg";
-import previousIcon from "../src/assets/PreviousIcon.svg";
-import nextIcon from "../src/assets/NextIcon.svg";
-import arrowRightIcon from "../src/assets/ArrowRightIcon.svg";
-import actionInactiveIcon from "../src/assets/ActionInactiveIcon.svg";
-import cloudIcon from "../src/assets/Cloud.svg";
-import deviceIcon from "../src/assets/Edge.svg"
 
-import axios from "axios";
+//components
+import Filter from "./components/Filter";
+import Table from "./components/Table";
+import Pagination from "./components/Pagination";
 
 
 
@@ -36,14 +33,16 @@ function App() {
 
 
   // **Filter Logic**
-  const filteredCameras = camerasList.filter((camera) => {
-    const matchesLocation = locationFilter ? camera.location === locationFilter : true;
-    const matchesStatus = statusFilter ? camera.status === statusFilter : true;
-    const matchesSearchQuery = searchQuery
-      ? camera.name.toLowerCase().includes(searchQuery.toLowerCase())
-      : true;
-    return matchesLocation && matchesStatus && matchesSearchQuery;
-  });
+  const filteredCameras = useMemo(() => {
+    return camerasList.filter((camera) => {
+      const matchesLocation = locationFilter ? camera.location === locationFilter : true;
+      const matchesStatus = statusFilter ? camera.status === statusFilter : true;
+      const matchesSearchQuery = searchQuery
+        ? camera.name.toLowerCase().includes(searchQuery.toLowerCase())
+        : true;
+      return matchesLocation && matchesStatus && matchesSearchQuery;
+    });
+  }, [camerasList, locationFilter, statusFilter, searchQuery]);
 
 
   const totalPages = Math.ceil(filteredCameras.length / rowsPerPage);
@@ -52,11 +51,12 @@ function App() {
   const endRow = Math.min(currentPage * rowsPerPage, filteredCameras.length);
 
   // Paginate after filtering
-  const paginatedData = filteredCameras.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
-  );
-
+  const paginatedData = useMemo(() => {
+    return filteredCameras.slice(
+      (currentPage - 1) * rowsPerPage,
+      currentPage * rowsPerPage
+    );
+  }, [filteredCameras, currentPage, rowsPerPage]);
 
   const handleRowsPerPageChange = (e) => {
     setRowsPerPage(Number(e.target.value));
@@ -155,139 +155,47 @@ function App() {
 
       {/* Filter Container */}
       <div className="filters">
-        <div className="filter-location-container">
-          <img src={locationIcon} alt="location-icon" className="location-icon" />
-          <select className="filter-location"
-            value={locationFilter}
-            onChange={(e) => setLocationFilter(e.target.value)}
-          >
-            <option value="" disabled selected hidden>Location</option>
-            {locations.map((location, index) => (
-              <option key={index} value={location}>
-                {location}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="filter-status-container">
-          <img src={statusIcon} alt="status-icon" className="status-icon" />
-          <select className="filter-status"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="" disabled selected hidden>Status</option>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
-          </select>
-        </div>
+        <Filter
+          icon={locationIcon}
+          value={locationFilter}
+          options={locations}
+          onChange={(e) => setLocationFilter(e.target.value)}
+          placeholder="Location"
+        />
+        <Filter
+          icon={statusIcon}
+          value={statusFilter}
+          options={["Active", "Inactive"]}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          placeholder="Status"
+        />
       </div>
 
       {/** Table */}
       <div className="table-container">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>
-                <input type="checkbox" className="table-checkbox" />
-              </th>
-              <th>NAME</th>
-              <th>HEALTH</th>
-              <th>LOCATION</th>
-              <th>RECORDER</th>
-              <th>TASKS</th>
-              <th>STATUS</th>
-              <th>ACTIONS</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedData.length ? paginatedData.map((camera) => (
-              <tr key={camera._id}>
-                <td><input type="checkbox" className="table-checkbox" /></td>
-                <td>
-                  <div className="name">
-                    <div className="name-top">
-                      <div className="name-status" style={{ backgroundColor: camera.current_status === "Online" ? "#029262" : "#DC3545" }}></div>
-                      <div className="name-text">{camera.name}</div>
-                      {camera.hasWarning && <img src={warningIcon} alt="warning-icon" className="name-warning" />}
-                    </div>
-                  </div>
-                  <div className="name-bottom">
-                    <span>sherwinwilliams@wobot.ai</span>
-                  </div>
-
-                </td>
-                <td>
-                  <div className="health">
-                    <div className="health-cloud">
-                      <img src={cloudIcon} alt="cloud-icon" />
-                      <span className="health-text">{camera.health.cloud}</span>
-                    </div>
-                    <div className="health-device">
-                      <img src={deviceIcon} alt="device-icon" />
-                      <span className="health-text">{camera.health.device}</span>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <span className="location">{camera.location}</span>
-                </td>
-                <td>
-                  <span className="recorder">{camera.recorder !== "" ? camera.recorder : 'N/A'}</span>
-                </td>
-                <td>
-                  <span className="tasks">{camera.tasks} Tasks</span>
-                </td>
-                <td>
-                  <div className="status" style={{ backgroundColor: camera.status === "Active" ? '#0292621A' : "#F0F0F0" }}>
-                    <span className="status-text"
-                      style={{
-                        color: camera.status === "Active" ? '#029262' : "#545454"
-                      }}>
-                      {camera.status === 'Active' ? "Active" : "Inactive"}
-                    </span>
-                  </div>
-                </td>
-                <td>
-                  <div className="action" onClick={() => updateCameraStatus(camera.id, camera.status === "Active" ? "Inactive" : "Active")}>
-                    {camera.status === "Active" ? <img src={actionActiveIcon} alt="action-icon" />
-                      : <img src={actionInactiveIcon} alt="action-icon" />}
-                  </div>
-                </td>
-                <td>
-                  <div className="delete-row" style={{ background: "#DC3545", cursor: "pointer" }} onClick={() => handleDelete(camera._id)}>
-                    <span className="delete-row-text" style={{ color: "white" }}>Delete</span>
-                  </div>
-                </td>
-              </tr>
-            )) : null}
-          </tbody>
-        </table>
+        <Table
+          data={paginatedData}
+          onDelete={handleDelete}
+          onStatusChange={updateCameraStatus}
+        />
       </div>
 
       {/** Table pagination */}
       {paginatedData.length ? <div className="table-pagination">
 
-        <div className="rows-per-page">
-          <select value={rowsPerPage} onChange={handleRowsPerPageChange} className="rows-per-page-option">
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-            <option value={50}>30</option>
-          </select>
-        </div>
-
-        <div className="row-range">
-          <span className="row-range-text">
-            {startRow}-{endRow} of {filteredCameras.length}
-          </span>
-        </div>
-
-        <div className="pagination-controls">
-          <img src={arrowLeftIcon} onClick={handleFirstPage} alt="arrow-left-icon" />
-          <img src={previousIcon} onClick={handlePreviousPage} alt="previous-icon" />
-          <img src={nextIcon} onClick={handleNextPage} alt="next-icon" />
-          <img src={arrowRightIcon} onClick={handleLastPage} alt="arrow-right-icon" />
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          startRow={startRow}
+          endRow={endRow}
+          totalItems={filteredCameras.length}
+          rowsPerPage={rowsPerPage}
+          handleFirstPage={handleFirstPage}
+          handlePreviousPage={handlePreviousPage}
+          handleNextPage={handleNextPage}
+          handleLastPage={handleLastPage}
+          handleRowsPerPageChange={handleRowsPerPageChange}
+        />
 
       </div> : null}
     </div>

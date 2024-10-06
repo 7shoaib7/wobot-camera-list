@@ -91,16 +91,14 @@ code {
   width: 100%;
 }
 
-.filter-location-container,
-.filter-status-container {
+.filter-container{
   position: relative;
   display: flex;
   align-items: center;
   height: 2.5rem;
 }
 
-.filter-location,
-.filter-status {
+.filter-select {
   width: 12rem;
   height: 100%;
   border-radius: 4px;
@@ -112,8 +110,7 @@ code {
   padding-left: 25px;
 }
 
-.location-icon,
-.status-icon {
+.filter-icon {
   position: absolute;
   left: 10px;
 }
@@ -245,6 +242,7 @@ code {
 .action {
   position: relative;
   left: 1rem;
+  cursor: pointer;
 }
 
 .table-pagination{
