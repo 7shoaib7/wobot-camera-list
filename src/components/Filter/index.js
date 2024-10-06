@@ -8,7 +8,7 @@ const Filter = ({icon, value, options, onChange, placeholder}) => {
         value={value}
         onChange={onChange}
       >
-        <option value="" disabled selected hidden>{placeholder}</option>
+        <option value="" disabled defaultValue hidden>{placeholder}</option>
         {options.map((option, index) => (
           <option key={index} value={option}>
             {option}
